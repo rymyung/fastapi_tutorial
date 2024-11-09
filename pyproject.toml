@@ -9,8 +9,14 @@ packages = [{include = "fastapi_tutorial"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 fastapi = "^0.104.1"
-uvicorn = "^0.24.0.post1"
+uvicorn = {extras = ["standard"], version = "^0.32.0"}
 ruff = "^0.1.5"
+py-ulid = "^1.0.3"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+pydantic = "^2.9.2"
+sqlalchemy = "^2.0.36"
+mysqlclient = "^2.2.5"
+alembic = "^1.14.0"
 
 
 [build-system]
