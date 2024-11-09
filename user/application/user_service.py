@@ -2,16 +2,19 @@ from ulid import ULID
 from datetime import datetime
 from user.domain.user import User
 from user.domain.repository.user_repo import IUserRepository
-from user.infra.repository.user_repo import UserRepository
 from fastapi import HTTPException
 from utils.crypto import Crypto
+from dependency_injector.wiring import inject
 
 class UserService:
-    def __init__(self):
-        # 유저를 데이터베이스에 저장하는 저장소는 인프라 계층에 구현체가 있어야 함
-        # 외부의 서비스로 다루는 모듈은 그 수준이 낮기 때문
-        # 따라서 데이터를 저장하기 위해 IUserRepository를 사용(의존성 역전))
-        self.user_repo: IUserRepository = UserRepository()
+    @inject # 의존성 객체를 사용하는 함수에 주입받은 객체를 사용한다고 선언
+    def __init__(
+        self,
+        # Depends 함수의 인수로 컨테이너에 등록된 UserRepository의 팩토리를 제공, UserService는 UserRepository를 직접 의존하지 않게 됨
+        # user_repo: IUserRepository = Depends(Provide[Container.user_repo]) -> 인터페이스 계층 외 FastAPI와 느슨하게 구현하기 위해서 아래 코드로 변경
+        user_repo: IUserRepository # 컨테이너에서 직접 user_repo 팩토리를 선언해두었기 때문에 타입 선언만으로도 UserService가 생성될 때 팩토리를 수행한 객체가 주입
+    ):
+        self.user_repo = user_repo
         self.ulid = ULID()
         self.crypto = Crypto()
         

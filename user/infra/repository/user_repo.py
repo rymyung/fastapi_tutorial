@@ -24,7 +24,7 @@ class UserRepository(IUserRepository):
             finally:
                 db.close()
     
-    def find_by_email(self, email: str) -> User:
+    def find_by_email(self, email: str) -> UserVO:
         with SessionLocal() as db:
             user = db.query(User).filter(User.email == email).first()
         

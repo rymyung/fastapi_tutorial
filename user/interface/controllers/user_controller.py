@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from user.application.user_service import UserService
+from dependency_injector.wiring import inject, Provide
+from containers import Container
 
 # 라우터는 클라이언트의 요청을 해당 요청에 맞는 핸들러 또는 컨트롤러로 연결해주는 매커니즘
 # 일반적으로 HTTP 요청(GET, POST, PUT, DELETE 등)과 URL 경로를 특정 함수 또는 핸들러로 맵핑
@@ -12,7 +14,11 @@ class CreateUserBody(BaseModel):
     password: str
 
 @router.post("", status_code=201) # /users라는 경로로 post 요청을 받을 수 있음, prefix가 /users이기 때문
-def create_user(user: CreateUserBody):
-    user_service = UserService()
-    created_user = user_service.create_user(user.name, user.email, user.password)
+@inject
+def create_user(
+    user: CreateUserBody,
+    user_service: UserService = Depends(Provide[Container.user_service])
+    # user_service: UserService = Depends(Provide["user_service"]) # 리터럴 문자열도 사용 가능
+):
+    created_user = user_service.create_user(user.name, user.email, user.password) # 주입받은 객체를 사용
     return created_user
