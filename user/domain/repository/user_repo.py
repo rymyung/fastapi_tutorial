@@ -24,3 +24,8 @@ class IUserRepository(metaclass=ABCMeta):
     @abstractmethod
     def update(self, user: User):
         raise NotImplementedError
+    
+    @abstractmethod
+    # Pagination
+    def get_users(self, page: int, items_per_page: int) -> tuple[int, list[User]]:
+        raise NotImplementedError
