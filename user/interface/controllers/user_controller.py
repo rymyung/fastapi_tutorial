@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, EmailStr, Field
 from user.application.user_service import UserService
@@ -8,12 +9,20 @@ from containers import Container
 # 일반적으로 HTTP 요청(GET, POST, PUT, DELETE 등)과 URL 경로를 특정 함수 또는 핸들러로 맵핑
 router = APIRouter(prefix="/users") # 유저 앱은 대부분 유저 엔티티를 다루는 기능을 가지므로 API 경로에 /users로 시작하도록 설정
 
+class UserResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    created_at: datetime
+    updated_at: datetime
+
+
 class CreateUserBody(BaseModel):
     name: str = Field(min_length=2, max_length=32)
     email: EmailStr = Field(max_length=64)
     password: str = Field(min_length=8, max_length=32)
 
-@router.post("", status_code=201) # /users라는 경로로 post 요청을 받을 수 있음, prefix가 /users이기 때문
+@router.post("", status_code=201, response_model=UserResponse) # /users라는 경로로 post 요청을 받을 수 있음, prefix가 /users이기 때문
 @inject
 def create_user(
     user: CreateUserBody,
