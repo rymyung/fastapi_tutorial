@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from user.application.user_service import UserService
 from dependency_injector.wiring import inject, Provide
 from containers import Container
+from typing import Annotated
 
 # 라우터는 클라이언트의 요청을 해당 요청에 맞는 핸들러 또는 컨트롤러로 연결해주는 매커니즘
 # 일반적으로 HTTP 요청(GET, POST, PUT, DELETE 등)과 URL 경로를 특정 함수 또는 핸들러로 맵핑
@@ -22,3 +24,17 @@ def create_user(
 ):
     created_user = user_service.create_user(user.name, user.email, user.password) # 주입받은 객체를 사용
     return created_user
+
+
+@router.post("/login")
+@inject
+def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    user_service: UserService = Depends(Provide[Container.user_service]),
+):
+    access_token = user_service.login(
+        email=form_data.username,
+        password=form_data.password,
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}

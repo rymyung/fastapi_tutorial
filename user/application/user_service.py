@@ -2,9 +2,10 @@ from ulid import ULID
 from datetime import datetime
 from user.domain.user import User
 from user.domain.repository.user_repo import IUserRepository
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from utils.crypto import Crypto
 from dependency_injector.wiring import inject
+from common.auth import create_access_token
 
 class UserService:
     @inject # 의존성 객체를 사용하는 함수에 주입받은 객체를 사용한다고 선언
@@ -41,3 +42,13 @@ class UserService:
         self.user_repo.save(user) # 생성된 유저 객체를 저장소로 전달해 저장
         
         return user
+    
+    def login(self, email: str, password: str):
+        user = self.user_repo.find_by_email(email)
+
+        if not self.crypto.verify(password, user.password):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+        
+        access_token = create_access_token(payload={"user_id": user.id})
+
+        return access_token

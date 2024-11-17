@@ -7,7 +7,12 @@ from containers import Container
 import uvicorn
 
 app = FastAPI()
-app.container = Container() # type: ignore
+
+# 컨테이너 설정 및 와이어링
+container = Container()
+container.wire(packages=["user"])
+app.container = container  # type: ignore
+
 app.include_router(user_routers)
 
 @app.exception_handler(RequestValidationError)
