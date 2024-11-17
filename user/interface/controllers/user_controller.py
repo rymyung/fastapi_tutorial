@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 from user.application.user_service import UserService
 from dependency_injector.wiring import inject, Provide
 from containers import Container
@@ -9,9 +9,9 @@ from containers import Container
 router = APIRouter(prefix="/users") # 유저 앱은 대부분 유저 엔티티를 다루는 기능을 가지므로 API 경로에 /users로 시작하도록 설정
 
 class CreateUserBody(BaseModel):
-    name: str
-    email: str
-    password: str
+    name: str = Field(min_length=2, max_length=32)
+    email: EmailStr = Field(max_length=64)
+    password: str = Field(min_length=8, max_length=32)
 
 @router.post("", status_code=201) # /users라는 경로로 post 요청을 받을 수 있음, prefix가 /users이기 때문
 @inject
