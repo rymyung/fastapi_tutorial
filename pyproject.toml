@@ -18,6 +18,8 @@ sqlalchemy = "^2.0.36"
 mysqlclient = "^2.2.5"
 alembic = "^1.14.0"
 dependency-injector = "^4.43.0"
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.6.1"
 
 
 [build-system]
